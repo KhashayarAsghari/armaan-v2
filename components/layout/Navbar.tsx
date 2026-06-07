@@ -2,14 +2,13 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
-import { Menu, X, Phone } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 export function Navbar() {
   const t = useTranslations('nav');
-  const locale = useLocale();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [navSticky, setNavSticky] = useState(false);
 
@@ -18,6 +17,11 @@ export function Navbar() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
 
   const navLinks = [
     { href: '/', label: t('home') },
@@ -30,54 +34,52 @@ export function Navbar() {
   return (
     <>
       {/* ── Top header ── */}
-      <header className="w-full z-50 px-4 sm:px-6 lg:px-10 py-3">
+      {/* sticky on mobile so hamburger stays accessible; static on desktop (pill nav takes over) */}
+      <header
+        className={`sticky top-0 md:static w-full z-100 px-4 sm:px-6 lg:px-10 py-3 transition-all duration-300 ${
+          navSticky ? 'md:bg-transparent' : ''
+        } bg-background/90 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none border-b border-white/5 md:border-transparent`}
+      >
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          {/* Left: language + theme + CTA */}
-          <div className={`flex items-center gap-2 ${locale !== 'en' ? 'order-first' : 'order-last'}`}>
+          {/* Logo + name */}
+          <Link href="/" className="flex items-center gap-3 shrink-0">
+            <div className="w-10 h-10 relative">
+              <Image src="/home-images/logo.png" alt="Armaan Legal" fill className="object-contain" priority />
+            </div>
+            <span className="text-sm font-semibold text-foreground hidden sm:block">دفتر حقوقی آرمان</span>
+          </Link>
+
+          {/* Desktop controls */}
+          <div className="hidden md:flex items-center gap-2">
             <LanguageSwitcher />
             <ThemeToggle />
             <Link
               href="/contact"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/15 hover:border-[#C4A24D]/60 text-sm transition-all duration-300"
-            >
-              <Phone size={13} />
-              <span>{t('contact')}</span>
-            </Link>
-            <Link
-              href="/contact"
-              className="hidden md:flex items-center px-4 py-1.5 rounded-full bg-[#C4A24D] hover:bg-[#D4B86A] text-black text-sm font-semibold transition-all duration-300 shadow-lg shadow-[#C4A24D]/20"
+              className="ms-2 inline-flex items-center px-4 py-1.5 rounded-full bg-[#C4A24D] hover:bg-[#D4B86A] text-black text-sm font-semibold transition-all duration-300 shadow-lg shadow-[#C4A24D]/20"
             >
               {t('consultation')}
             </Link>
           </div>
 
-          {/* Right: logo + name */}
-          <div className={`flex items-center gap-3 ${locale !== 'en' ? 'order-last' : 'order-first'}`}>
-            <div className="flex flex-col items-end leading-tight">
-              <span className="text-sm font-semibold text-foreground hidden sm:block">دفتر حقوقی آرمان</span>
-            </div>
-            <div className="w-10 h-10 relative">
-              <Image src="/home-images/logo.png" alt="Armaan Legal" fill className="object-contain" priority />
-            </div>
+          {/* Mobile controls */}
+          <div className="flex items-center gap-2 md:hidden">
+            <LanguageSwitcher />
+            <ThemeToggle />
+            <button
+              className="w-9 h-9 flex items-center justify-center rounded-full border border-white/15 hover:border-[#C4A24D]/40 transition-colors"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
           </div>
-
-          {/* Mobile toggle */}
-          <button
-            className="md:hidden w-9 h-9 flex items-center justify-center rounded-full border border-white/15"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
-          </button>
         </div>
       </header>
 
-      {/* ── Floating pill nav ── */}
+      {/* ── Floating pill nav (desktop only) ── */}
       <div
         className={`hidden md:block w-full z-50 px-4 sm:px-6 lg:px-10 transition-all duration-500 ${
-          navSticky
-            ? 'fixed top-0 py-2'
-            : 'relative -mt-2 py-0'
+          navSticky ? 'fixed top-0 py-2' : 'relative -mt-2 py-0'
         }`}
       >
         <nav
@@ -99,31 +101,37 @@ export function Navbar() {
         </nav>
       </div>
 
-      {/* ── Mobile menu ── */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-40 flex flex-col pt-20 md:hidden">
-          <div className="absolute inset-0 bg-background/95 backdrop-blur-xl" onClick={() => setMobileOpen(false)} />
-          <nav className="relative z-10 flex flex-col items-center gap-2 py-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="px-8 py-3 text-lg text-foreground hover:text-[#C4A24D] transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
+      {/* ── Mobile menu overlay ── */}
+      <div
+        className={`fixed inset-0 z-90 md:hidden transition-all duration-300 ${
+          mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        <div className="absolute inset-0 bg-background/95 backdrop-blur-xl" onClick={() => setMobileOpen(false)} />
+        <nav
+          className={`relative z-10 flex flex-col items-center justify-center h-full gap-2 transition-all duration-300 ${
+            mobileOpen ? 'translate-y-0' : '-translate-y-4'
+          }`}
+        >
+          {navLinks.map((link) => (
             <Link
-              href="/contact"
+              key={link.href}
+              href={link.href}
               onClick={() => setMobileOpen(false)}
-              className="mt-4 px-8 py-3 rounded-full bg-[#C4A24D] text-black font-semibold"
+              className="px-8 py-3 text-xl text-foreground hover:text-[#C4A24D] transition-colors font-medium"
             >
-              {t('consultation')}
+              {link.label}
             </Link>
-          </nav>
-        </div>
-      )}
+          ))}
+          <Link
+            href="/contact"
+            onClick={() => setMobileOpen(false)}
+            className="mt-6 px-10 py-3.5 rounded-full bg-[#C4A24D] hover:bg-[#D4B86A] text-black font-bold text-base transition-all duration-300"
+          >
+            {t('consultation')}
+          </Link>
+        </nav>
+      </div>
     </>
   );
 }
