@@ -1,0 +1,72 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "services": "Services",
+    "blog": "Blog",
+    "contact": "Contact",
+    "consultation": "Request Consultation"
+  },
+  "hero": {
+    "title": "A Legal Partner That Actually Delivers",
+    "subtitle": "Innovative Contracts / Legal Services / Trade Consulting / Customs Services",
+    "cta": "Start Collaboration",
+    "trusted": "Trusted by 500+ Companies"
+  },
+  "about": {
+    "title": "More Than a Broker",
+    "subtitle": "A specialist team for fast, accurate, and compliant clearance. You need smart tools and expert people. We have both.",
+    "stats": {
+      "years": "Years of Experience",
+      "clients": "Satisfied Clients",
+      "cases": "Successful Cases",
+      "countries": "Countries Covered"
+    },
+    "card1Title": "Professional Customs Services",
+    "card1Desc": "With over 10 years of experience in cargo clearance and customs affairs, our team is ready to provide the best services. From initial consultation to final delivery, we are by your side.",
+    "card2Title": "Smart Trade Solutions",
+    "card2Desc": "Using the latest technologies and intelligent systems to speed up and simplify customs processes. Our online platform provides real-time tracking of your shipments."
+  },
+  "services": {
+    "title": "Our Market, Our Services",
+    "s1Title": "International Sourcing, Freight & Transit",
+    "s1Desc": "From order registration to final delivery — every step of foreign trade in one structured, trackable system",
+    "s2Title": "Specialized Customs & Cargo Clearance",
+    "s2Desc": "Fast, reliable clearance in full compliance with current customs regulations",
+    "s3Title": "Legal Advisory & Commercial Contract Management",
+    "s3Desc": "From drafting contracts to resolving customs disputes, we stand by your side",
+    "s4Title": "Integrated Foreign Trade Management",
+    "s4Desc": "Quotation, transit, EPL, trade card, order registration — all in one coordinated intelligent system"
+  },
+  "blog": {
+    "title": "Blog",
+    "viewAll": "View All",
+    "readMore": "Read More"
+  },
+  "testimonials": {
+    "title": "What Our Clients Say"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Get in touch for a free consultation",
+    "name": "Full Name",
+    "email": "Email",
+    "phone": "Phone Number",
+    "message": "Your Message",
+    "submit": "Send Message",
+    "success": "Your message was sent successfully",
+    "address": "Address",
+    "addressValue": "Tehran, Valiasr St., No. 123",
+    "phone2": "Phone",
+    "phoneValue": "+98 21 8888 8888",
+    "emailLabel": "Email",
+    "emailValue": "info@armaan-legal.com"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "company": "Armaan Legal Office"
+  },
+  "theme": {
+    "toggle": "Toggle theme"
+  }
+}
