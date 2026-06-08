@@ -51,7 +51,7 @@ export function Contact() {
     }
   }
 
-  const fieldClass = `w-full px-4 py-3 rounded-xl border bg-background/60 text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:border-[#C4A24D]/60 focus:ring-2 focus:ring-[#C4A24D]/10 transition-all duration-200`;
+  const fieldClass = `w-full px-4 py-3 rounded-xl border bg-background text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:border-[#C4A24D]/60 focus:ring-2 focus:ring-[#C4A24D]/10 transition-all duration-200`;
   const errClass = `border-red-500/60`;
 
   return (

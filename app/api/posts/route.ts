@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { posts, postTranslations } from '@/lib/schema';
+import { eq, desc } from 'drizzle-orm';
 import { z } from 'zod';
 
 const translationSchema = z.object({
-  title: z.string().min(1).max(500),
+  title: z.string().max(500).default(''),
   excerpt: z.string().optional(),
   content: z.string().optional(),
 });
@@ -30,13 +31,16 @@ export async function POST(req: NextRequest) {
 
     const postId = (result as { insertId: number }).insertId;
 
-    const translationRows = Object.entries(data.translations).map(([locale, t]) => ({
-      postId,
-      locale: locale as 'fa' | 'en' | 'ar',
-      title: t.title,
-      excerpt: t.excerpt ?? null,
-      content: t.content ?? null,
-    }));
+    // Only insert translations that have a non-empty title
+    const translationRows = Object.entries(data.translations)
+      .filter(([, t]) => t.title.trim() !== '')
+      .map(([locale, t]) => ({
+        postId,
+        locale: locale as 'fa' | 'en' | 'ar',
+        title: t.title,
+        excerpt: t.excerpt ?? null,
+        content: t.content ?? null,
+      }));
 
     if (translationRows.length > 0) {
       await db.insert(postTranslations).values(translationRows);
@@ -47,15 +51,42 @@ export async function POST(req: NextRequest) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: err.flatten() }, { status: 422 });
     }
-    console.error('[posts]', err);
+    console.error('[posts POST]', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function GET() {
   try {
-    const allPosts = await db.select().from(posts).orderBy(posts.createdAt);
-    return NextResponse.json(allPosts);
+    // Fetch posts with their Persian translation for the admin list
+    const rows = await db
+      .select({
+        id: posts.id,
+        slug: posts.slug,
+        category: posts.category,
+        published: posts.published,
+        createdAt: posts.createdAt,
+        faTitle: postTranslations.title,
+      })
+      .from(posts)
+      .leftJoin(
+        postTranslations,
+        eq(postTranslations.postId, posts.id)
+      )
+      .orderBy(desc(posts.createdAt));
+
+    // Collapse: one row per post (take first fa translation title found)
+    const map = new Map<number, typeof rows[0]>();
+    for (const row of rows) {
+      if (!map.has(row.id)) {
+        map.set(row.id, row);
+      } else if (row.faTitle) {
+        // prefer a row that has a title
+        map.set(row.id, row);
+      }
+    }
+
+    return NextResponse.json(Array.from(map.values()));
   } catch (err) {
     console.error('[posts GET]', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

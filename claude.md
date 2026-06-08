@@ -11,19 +11,25 @@
 | Topic | Decision |
 |---|---|
 | Color palette | Dark black + gold from screenshots — refined/professional usage |
-| Logo | `<img src="/logo.svg" />` — file provided by user later |
-| Hero image | Stock legal/port image (placeholder) |
+| Logo | `/home-images/logo.png` |
+| Hero image | `/home-images/hero.png` |
 | Contact form | Wired to database from day one |
 | Team section | Skip for now |
 | Animations | Yes — subtle scroll-triggered animations |
-| Header | Standard (not sticky), beautiful UI/UX |
+| Header | Sticky on mobile, floating pill nav on desktop |
 | Dark/light mode | Toggle included |
-| Database | MySQL on host — no schema designed yet |
+| Database | MySQL on host |
 | ORM | Drizzle ORM (TypeScript-first, lightweight) |
 | Persian/Arabic font | Vazirmatn (Google Fonts) |
-| Blog content storage | Rich HTML via a powerful WYSIWYG editor |
-| Blog images | Uploaded to server (NOT base64 embedded) — requires file upload API |
-| Rich text editor | **Lexical** — handles inline Persian + English BiDi without collapse |
+| Content storage | Rich HTML via Lexical WYSIWYG editor |
+| Images in content | Uploaded to server (POST /api/upload) — never base64 |
+| Rich text editor | **Lexical** — handles Persian + English BiDi without collapse |
+| Admin auth | Custom JWT → httpOnly + Secure cookie; single fixed user from .env |
+| Post status | Per-locale: each translation has its own `draft \| published` status |
+| Cover image | Per-locale: each translation has its own cover/thumbnail image |
+| Content types | `blog \| news \| tutorial` — all share the same `posts` schema |
+| Slug | Shared across locales (one slug per post, on `posts` table) |
+| Tutorials extra fields | None — same structure as blog |
 
 ---
 
@@ -76,21 +82,27 @@
 
 **Tables:**
 
-- `users` — id, email, password_hash, role (`admin` | `editor`), created_at
-- `posts` — id, slug, category (`blog` | `article` | `news` | `tutorial`), author_id, published_at, created_at, updated_at
-- `post_translations` — id, post_id, locale (`fa` | `en` | `ar`), title, excerpt, content (LONGTEXT — rich HTML), meta_title, meta_description
+- `posts` — id, slug (UNIQUE), category (`blog | news | tutorial`), created_at, updated_at
+- `post_translations` — id, post_id, locale (`fa | en | ar`), title, excerpt, content (LONGTEXT — rich HTML), cover_image (VARCHAR nullable), status (`draft | published`), published_at (nullable), meta_title, meta_description
 - `post_images` — id, post_id, filename, path, size, created_at ← tracks uploaded images per post
-- `contacts` — id, name, email, phone, message, created_at, read (boolean)
+- `contacts` — id, name, email, phone, message, created_at, read (boolean default false)
+
+> No `users` table — admin auth uses a single fixed user from .env (see Phase 9).
+
+**Unique constraint:** `(post_id, locale)` on `post_translations` — one row per language per post.
 
 **File uploads:**
-- Uploaded images stored in `public/uploads/` (or a dedicated `/uploads` volume)
-- API route: `POST /api/upload` → saves file, returns URL
-- Tiptap image extension calls this API when admin inserts an image
+- Uploaded images stored in `public/uploads/`
+- API route: `POST /api/upload` → saves file, returns `{ url: "/uploads/filename.ext" }`
+- Lexical image plugin calls this API when admin inserts an image
 
 **.env:**
 ```
 DATABASE_URL=mysql://user:pass@host:3306/dbname
 UPLOAD_DIR=./public/uploads
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD_HASH=bcrypt_hash_here
+JWT_SECRET=long_random_secret
 ```
 
 ---
@@ -99,38 +111,68 @@ UPLOAD_DIR=./public/uploads
 
 ```
 app/
-├── [locale]/                    ← /en and /ar prefixed routes
-│   ├── layout.tsx               ← sets lang + dir per locale
-│   ├── page.tsx                 ← homepage
+├── [locale]/                      ← /en and /ar prefixed routes
+│   ├── layout.tsx                 ← sets lang + dir per locale
+│   ├── page.tsx                   ← homepage
 │   ├── about/page.tsx
 │   ├── contact/page.tsx
 │   ├── blog/
-│   │   ├── page.tsx             ← blog listing
-│   │   └── [slug]/page.tsx      ← single post
-│   └── admin/
-│       ├── layout.tsx           ← admin shell (auth guard later)
-│       ├── page.tsx             ← dashboard stub
-│       └── posts/
-│           ├── page.tsx         ← post list
-│           ├── new/page.tsx     ← create post (Lexical editor)
-│           └── [id]/page.tsx    ← edit post (Lexical editor)
-├── layout.tsx                   ← root layout (ThemeProvider)
-├── page.tsx                     ← Persian homepage (no prefix)
+│   │   ├── page.tsx               ← blog listing (published only)
+│   │   └── [slug]/page.tsx        ← single post
+│   ├── news/
+│   │   ├── page.tsx               ← news listing
+│   │   └── [slug]/page.tsx        ← single news item
+│   └── tutorials/
+│       ├── page.tsx               ← tutorials listing
+│       └── [slug]/page.tsx        ← single tutorial
+├── layout.tsx                     ← root layout (ThemeProvider)
+├── page.tsx                       ← Persian homepage (no prefix)
 ├── about/page.tsx
 ├── contact/page.tsx
 ├── blog/
 │   ├── page.tsx
 │   └── [slug]/page.tsx
-api/
-├── upload/route.ts              ← image upload handler
-├── contact/route.ts             ← contact form submission
-└── posts/route.ts               ← post CRUD (used by admin)
+├── news/
+│   ├── page.tsx
+│   └── [slug]/page.tsx
+├── tutorials/
+│   ├── page.tsx
+│   └── [slug]/page.tsx
+├── admin/
+│   ├── login/page.tsx             ← login form (public)
+│   ├── layout.tsx                 ← auth guard + sidebar shell
+│   ├── page.tsx                   ← dashboard (stats + recents)
+│   ├── contacts/
+│   │   └── page.tsx               ← contact list, mark read, delete
+│   ├── blog/
+│   │   ├── page.tsx               ← post list with status badges
+│   │   ├── new/page.tsx           ← create (locale tabs + editor)
+│   │   └── [id]/page.tsx          ← edit (locale tabs + editor)
+│   ├── news/
+│   │   ├── page.tsx
+│   │   ├── new/page.tsx
+│   │   └── [id]/page.tsx
+│   └── tutorials/
+│       ├── page.tsx
+│       ├── new/page.tsx
+│       └── [id]/page.tsx
+└── api/
+    ├── auth/
+    │   ├── login/route.ts         ← POST: verify creds → set JWT cookie
+    │   └── logout/route.ts        ← POST: clear cookie
+    ├── upload/route.ts            ← POST: save image, return URL
+    ├── contact/route.ts           ← POST: save contact form
+    └── posts/
+        ├── route.ts               ← GET ?category=&locale= / POST
+        └── [id]/
+            └── route.ts           ← GET / PUT / DELETE
 
-proxy.ts                         ← language detection + locale redirect
+proxy.ts                           ← language detection + locale redirect
 lib/
-├── db.ts                        ← Drizzle + mysql2 connection
-├── schema.ts                    ← all table definitions
-└── utils.ts                     ← (existing)
+├── db.ts                          ← Drizzle + mysql2 connection
+├── schema.ts                      ← all table definitions
+├── auth.ts                        ← JWT sign/verify, cookie helpers
+└── utils.ts
 messages/
 ├── fa.json
 ├── en.json
@@ -139,7 +181,8 @@ i18n/
 ├── config.ts
 └── request.ts
 public/
-└── uploads/                     ← uploaded blog images land here
+├── home-images/                   ← hero.png, logo.png, stack1.png, stack2.png
+└── uploads/                       ← runtime-uploaded content images
 ```
 
 ---
@@ -187,35 +230,145 @@ Animations:
 
 ---
 
-### Phase 8 — Admin Panel (Stub → Editor)
+### Phase 8 — Public Content Pages (Blog / News / Tutorials)
 
-- `/admin` route with sidebar layout
-- Post list page
-- Create/Edit post page with full **Lexical** WYSIWYG editor:
-  - Headings (H1–H4), bold, italic, underline, strikethrough
-  - Ordered/unordered lists
-  - Tables
-  - Image upload — toolbar button + drag & drop → calls `/api/upload` → stored as URL, never base64
-  - Code blocks
-  - Link insertion
-  - RTL/LTR toggle per block (Persian paragraph can have inline English without collapse)
-  - Inline BiDi: Unicode Bidirectional Algorithm handles `متن فارسی example متن` natively
-- Language tabs: write Persian / English / Arabic content for each post
+- Listing pages: fetch published translations for current locale; show cover image, title, excerpt, date, "ادامه مطلب"
+- Detail pages: fetch single post by slug + locale; render `content` HTML safely; set `<html dir>` per locale
+- If no translation exists for the current locale → show 404 (do NOT fall back to another locale)
+- `generateMetadata()` per page uses `meta_title` / `meta_description` from `post_translations`
+- Open Graph cover image from `cover_image` field
 
 ---
 
-## Open Questions (no blockers — decisions made above)
+### Phase 9 — Admin Panel (Full Implementation)
 
-- Authentication for admin panel: **not in scope yet** (stub only for now)
-- Email notification on contact form: deferred (store in DB first)
+#### 9-A Auth
+
+- `lib/auth.ts` — `signJwt(payload)`, `verifyJwt(token)`, `getSession(request)` using `jose` (Edge-compatible)
+- Login flow: `POST /api/auth/login` → compare email+password against .env values (bcrypt) → sign JWT (24h) → set `Set-Cookie: token=...; HttpOnly; Secure; SameSite=Lax; Path=/`
+- Logout: `POST /api/auth/logout` → clear cookie
+- `app/admin/layout.tsx` reads cookie → calls `getSession()` → redirects to `/admin/login` if invalid
+- `app/admin/login/page.tsx` — clean form, gold CTA button, error state
+
+#### 9-B Admin Sidebar Layout
+
+- Persistent sidebar (collapsible on mobile) with sections:
+  - Dashboard
+  - درخواست‌های مشاوره (contacts)
+  - بلاگ
+  - اخبار
+  - آموزش‌ها
+- Active route highlighted, section badges show unread count (contacts) or total count
+- Top bar: site name + logout button
+- Dark theme always (independent of site theme)
+
+#### 9-C Content List Pages (Blog / News / Tutorials)
+
+Each list page:
+- Table: cover thumbnail (small), title (fa fallback), category badge, per-locale status chips (fa/en/ar: published=green, draft=gray, missing=empty), created_at, actions (edit / delete)
+- "افزودن جدید" button → `/admin/[section]/new`
+- Delete: confirm dialog → `DELETE /api/posts/[id]` (deletes post + all translations + images)
+- Pagination (20 per page)
+
+#### 9-D Create / Edit Form
+
+**Locale tabs** — three tabs: فارسی | English | العربية
+
+Each tab independently contains:
+- Cover image upload (drag & drop or click; preview shown; calls `POST /api/upload`)
+- Title (text input)
+- Excerpt (textarea, ~160 chars)
+- **Lexical WYSIWYG editor** (see 9-E)
+- Meta title + meta description (SEO accordion)
+- Status toggle: Draft / Published (+ published_at auto-set on first publish)
+
+**Shared fields** (above tabs):
+- Slug (auto-generated from fa title on create; editable; unique validation via API)
+- Category (blog / news / tutorial) — pre-set based on which section opened from
+
+**Save behavior**: one `POST /api/posts` or `PUT /api/posts/[id]` call sends all locale data in a single payload; server upserts `post_translations` rows.
+
+#### 9-E Lexical Editor (per locale tab)
+
+Editor `dir` attribute: `rtl` for `fa`/`ar`, `ltr` for `en`
+
+Toolbar buttons:
+| Group | Buttons |
+|---|---|
+| Format | H1 H2 H3 H4 \| Normal |
+| Inline | Bold Italic Underline Strikethrough |
+| Lists | Unordered Ordered |
+| Insert | Link \| Image \| Table \| Code block |
+| Direction | RTL / LTR per block |
+
+Image insert flow:
+1. Click toolbar image button (or drag & drop file into editor)
+2. File picker opens → user selects image
+3. `POST /api/upload` (multipart) → server saves to `public/uploads/` → returns `{ url }`
+4. Lexical `ImageNode` inserted with that URL
+5. Server also saves a row in `post_images` so orphan cleanup is possible later
+
+HTML serialization: `@lexical/html` `$generateHtmlFromNodes()` → stored in `post_translations.content`
+
+#### 9-F Contacts Page
+
+- Table: name, email, phone, message (truncated), date, read/unread badge
+- Click row → expand message, mark as read (`PATCH /api/posts` — or separate `/api/contacts/[id]`)
+- Delete contact
+- Unread count shown in sidebar badge
+
+#### 9-G API Routes
+
+| Method | Route | Description |
+|---|---|---|
+| POST | `/api/auth/login` | Verify creds, set JWT cookie |
+| POST | `/api/auth/logout` | Clear cookie |
+| GET | `/api/posts?category=blog&locale=fa&status=published` | List posts (public) |
+| GET | `/api/posts?category=blog` | List posts (admin, all statuses) |
+| POST | `/api/posts` | Create post + translations |
+| GET | `/api/posts/[id]` | Get single post with all translations |
+| PUT | `/api/posts/[id]` | Update post + upsert translations |
+| DELETE | `/api/posts/[id]` | Delete post + cascade |
+| POST | `/api/upload` | Save uploaded image → return URL |
+| POST | `/api/contact` | Save contact form submission |
+| GET | `/api/contacts` | List contacts (admin only) |
+| PATCH | `/api/contacts/[id]` | Mark read / update |
+| DELETE | `/api/contacts/[id]` | Delete contact |
+
+All `/api/posts` write routes and all `/api/contacts` routes require valid JWT cookie.
 
 ---
 
-## Status: PHASE 1–8 COMPLETE ✅ — build passing, zero TS errors
+### Phase 10 — New Package Requirements for Admin
 
-### What to do next
-1. Copy `.env.example` → `.env.local` and fill in your MySQL credentials
-2. Run `npm run db:push` to push the schema to your MySQL database
-3. Run `npm run dev` to start the development server
-4. Add `/public/hero-bg.jpg`, `/public/logo.svg`, and blog images
-5. Proceed to: content for About/Services pages, blog module with dynamic DB queries, admin authentication
+| Package | Purpose |
+|---|---|
+| `jose` | Edge-compatible JWT sign/verify (replaces `jsonwebtoken`) |
+| `bcryptjs` | Password hashing for admin login |
+| `@types/bcryptjs` | Types |
+
+---
+
+## Open Questions
+
+- Email notification on contact form: deferred (store in DB first, email later)
+
+---
+
+## Status
+
+- **PHASE 1–8 (homepage + public pages)**: ✅ COMPLETE — build passing, zero TS errors
+- **PHASE 9 (admin panel)**: 🔲 NOT STARTED — roadmap finalized, ready to implement
+
+### What to do next (Phase 9 start)
+1. `npm install jose bcryptjs @types/bcryptjs`
+2. Update `lib/schema.ts` — add `status`, `cover_image`, `published_at` to `post_translations`; remove `users` table; update `category` enum to `blog | news | tutorial`
+3. Run `npm run db:push`
+4. Build `lib/auth.ts` — JWT helpers
+5. Build `/api/auth/login` and `/api/auth/logout`
+6. Build `app/admin/login/page.tsx`
+7. Build `app/admin/layout.tsx` with auth guard + sidebar
+8. Build content list + create/edit pages for blog, news, tutorials
+9. Wire Lexical editor with image upload plugin
+10. Build contacts page
+11. Build public-facing `/[locale]/news` and `/[locale]/tutorials` routes

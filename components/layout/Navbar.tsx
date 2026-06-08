@@ -38,7 +38,7 @@ export function Navbar() {
       <header
         className={`sticky top-0 md:static w-full z-100 px-4 sm:px-6 lg:px-10 py-3 transition-all duration-300 ${
           navSticky ? 'md:bg-transparent' : ''
-        } bg-background/90 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none border-b border-white/5 md:border-transparent`}
+        } bg-background/95 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none border-b border-border/60 md:border-transparent`}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           {/* Logo + name */}
@@ -85,8 +85,8 @@ export function Navbar() {
         <nav
           className={`max-w-3xl mx-auto flex items-center justify-center gap-1 px-6 py-3 rounded-full transition-all duration-500 ${
             navSticky
-              ? 'bg-background/90 backdrop-blur-xl border border-white/10 shadow-2xl'
-              : 'bg-white/95 dark:bg-white/10 backdrop-blur-md border border-black/5 dark:border-white/8 shadow-lg'
+              ? 'bg-background/95 backdrop-blur-xl border border-border/70 shadow-2xl'
+              : 'bg-white/95 dark:bg-[#1C2B4A]/80 backdrop-blur-md border border-black/8 dark:border-white/15 shadow-lg'
           }`}
         >
           {navLinks.map((link) => (

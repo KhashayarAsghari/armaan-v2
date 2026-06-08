@@ -85,8 +85,8 @@ export function Hero() {
       </div>
 
       {/* Bottom wave */}
-      <div className="absolute bottom-0 left-0 right-0">
-        <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full text-background">
+      <div className="absolute bottom-0 left-0 right-0 leading-none translate-y-px">
+        <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full block text-background">
           <path d="M0 60L60 50C120 40 240 20 360 16.7C480 13 600 27 720 33.3C840 40 960 40 1080 33.3C1200 27 1320 13 1380 6.7L1440 0V60H0Z" fill="currentColor" />
         </svg>
       </div>

@@ -1,5 +1,5 @@
 import { setRequestLocale } from 'next-intl/server';
-import { NewPostForm } from '@/components/editor/NewPostForm';
+import { PostForm } from '@/components/editor/PostForm';
 
 export default async function NewPostPage({
   params,
@@ -10,9 +10,9 @@ export default async function NewPostPage({
   setRequestLocale(locale);
 
   return (
-    <div className="p-8">
+    <div className="p-6 sm:p-8">
       <h1 className="text-2xl font-bold text-foreground mb-8">مقاله جدید</h1>
-      <NewPostForm />
+      <PostForm />
     </div>
   );
 }

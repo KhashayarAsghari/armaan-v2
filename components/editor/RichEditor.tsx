@@ -8,19 +8,19 @@ import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
+import { $generateHtmlFromNodes } from '@lexical/html';
 import { $getRoot } from 'lexical';
 import { HeadingNode, QuoteNode, $createHeadingNode } from '@lexical/rich-text';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { LinkNode, AutoLinkNode } from '@lexical/link';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import { CodeNode, CodeHighlightNode } from '@lexical/code';
+import { ImageNode, $createImageNode } from './ImageNode';
 import {
   FORMAT_TEXT_COMMAND,
   FORMAT_ELEMENT_COMMAND,
   UNDO_COMMAND,
   REDO_COMMAND,
-  $createParagraphNode,
 } from 'lexical';
 import { INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND } from '@lexical/list';
 import {
@@ -57,12 +57,8 @@ function Toolbar() {
       if (!res.ok) return;
       const { url } = (await res.json()) as { url: string };
       editor.update(() => {
-        const para = $createParagraphNode();
-        const imgHtml = `<img src="${url}" alt="" style="max-width:100%;border-radius:8px;" />`;
-        const dom = new DOMParser().parseFromString(imgHtml, 'text/html');
-        const nodes = $generateNodesFromDOM(editor, dom);
-        para.append(...nodes);
-        $getRoot().append(para);
+        const imageNode = $createImageNode({ src: url, altText: file.name });
+        $getRoot().append(imageNode);
       });
     };
     input.click();
@@ -157,6 +153,7 @@ export function RichEditor({
       LinkNode, AutoLinkNode,
       TableNode, TableCellNode, TableRowNode,
       CodeNode, CodeHighlightNode,
+      ImageNode,
     ],
     onError: (err: Error) => console.error('[Lexical]', err),
   };
