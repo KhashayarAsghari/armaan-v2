@@ -35,8 +35,7 @@ export function Hero() {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url('/home-images/hero.png'), linear-gradient(135deg, #080e1c 0%, #1C2B4A 60%, #0d0d0d 100%)`,
-          backgroundBlendMode: 'multiply',
+          backgroundImage: 'linear-gradient(135deg, #080e1c 0%, #1C2B4A 60%, #0d0d0d 100%)',
         }}
       />
       {/* Overlay gradients */}
@@ -62,14 +61,14 @@ export function Hero() {
 
         <p
           ref={subRef}
-          className="text-base sm:text-lg text-white/70 max-w-2xl mx-auto mb-10"
+          className="text-base sm:text-lg text-white/75 max-w-3xl mx-auto mb-10 leading-8"
         >
           {t('subtitle')}
         </p>
 
         <div ref={ctaRef} className="flex items-center justify-center gap-4 flex-wrap">
           <Link
-            href="/contact"
+            href="/consultation"
             className="group inline-flex items-center gap-2.5 px-8 py-4 rounded-full bg-[#C4A24D] hover:bg-[#D4B86A] text-black font-bold text-base transition-all duration-300 shadow-xl shadow-[#C4A24D]/25 hover:shadow-[#C4A24D]/40 hover:scale-105"
           >
             {t('cta')}
@@ -79,7 +78,7 @@ export function Hero() {
             href="/about"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-white/25 text-white hover:border-white/50 hover:bg-white/8 font-medium text-base transition-all duration-300"
           >
-            {useTranslations('nav')('about')}
+            {t('secondaryCta')}
           </Link>
         </div>
       </div>

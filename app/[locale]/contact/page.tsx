@@ -1,7 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
-import { Contact } from '@/components/home/Contact';
+import { ContactPageContent } from '@/components/contact/ContactPageContent';
 
 export default async function ContactPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -10,7 +10,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
     <main className="flex flex-col min-h-screen">
       <Navbar />
       <div className="pt-10 flex-1">
-        <Contact />
+        <ContactPageContent />
       </div>
       <Footer />
     </main>

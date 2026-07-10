@@ -5,9 +5,10 @@ import { Footer } from '@/components/layout/Footer';
 import { Hero } from '@/components/home/Hero';
 import { About } from '@/components/home/About';
 import { Services } from '@/components/home/Services';
+import { Announcements } from '@/components/home/Announcements';
 import { BlogPreview } from '@/components/home/BlogPreview';
-import { Testimonials } from '@/components/home/Testimonials';
-import { Contact } from '@/components/home/Contact';
+import { WhyChooseUs } from '@/components/home/WhyChooseUs';
+import { TeamSection } from '@/components/home/TeamSection';
 
 export async function generateMetadata({
   params,
@@ -44,9 +45,13 @@ export default async function HomePage({
       <div className="py-4">
         <div className="gold-divider" />
       </div>
+      <Announcements />
+      <div className="py-4">
+        <div className="gold-divider" />
+      </div>
       <BlogPreview />
-      <Testimonials />
-      <Contact />
+      <WhyChooseUs />
+      <TeamSection />
       <Footer />
     </main>
   );

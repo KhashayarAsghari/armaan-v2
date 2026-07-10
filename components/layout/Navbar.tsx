@@ -44,7 +44,14 @@ export function Navbar() {
           {/* Logo + name */}
           <Link href="/" className="flex items-center gap-3 shrink-0">
             <div className="w-10 h-10 relative">
-              <Image src="/home-images/logo.png" alt="Armaan Legal" fill className="object-contain" priority />
+              <Image
+                src="/home-images/logo.png"
+                alt="Armaan Legal"
+                fill
+                sizes="40px"
+                className="object-contain"
+                priority
+              />
             </div>
             <span className="text-sm font-semibold text-foreground hidden sm:block">دفتر حقوقی آرمان</span>
           </Link>
@@ -54,7 +61,7 @@ export function Navbar() {
             <LanguageSwitcher />
             <ThemeToggle />
             <Link
-              href="/contact"
+              href="/consultation"
               className="ms-2 inline-flex items-center px-4 py-1.5 rounded-full bg-[#C4A24D] hover:bg-[#D4B86A] text-black text-sm font-semibold transition-all duration-300 shadow-lg shadow-[#C4A24D]/20"
             >
               {t('consultation')}
@@ -124,7 +131,7 @@ export function Navbar() {
             </Link>
           ))}
           <Link
-            href="/contact"
+            href="/consultation"
             onClick={() => setMobileOpen(false)}
             className="mt-6 px-10 py-3.5 rounded-full bg-[#C4A24D] hover:bg-[#D4B86A] text-black font-bold text-base transition-all duration-300"
           >

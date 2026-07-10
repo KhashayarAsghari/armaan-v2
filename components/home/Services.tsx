@@ -1,17 +1,22 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import { Ship, Stamp, Scale, Network } from 'lucide-react';
+import { Link } from '@/i18n/navigation';
+import { ArrowLeft, ArrowRight, BriefcaseBusiness, Gavel, ShieldCheck, Truck, Workflow } from 'lucide-react';
 import { useEffect, useRef } from 'react';
+import { useLocale } from 'next-intl';
 
 const services = [
-  { icon: Ship, key: 's1' },
-  { icon: Stamp, key: 's2' },
-  { icon: Scale, key: 's3' },
-  { icon: Network, key: 's4' },
+  { icon: ShieldCheck, key: 's1' },
+  { icon: Truck, key: 's2' },
+  { icon: BriefcaseBusiness, key: 's3' },
+  { icon: Gavel, key: 's4' },
+  { icon: Workflow, key: 's5' },
 ];
 
 export function Services() {
   const t = useTranslations('services');
+  const locale = useLocale();
+  const Arrow = locale === 'en' ? ArrowRight : ArrowLeft;
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -44,15 +49,15 @@ export function Services() {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
           {services.map(({ icon: Icon, key }, i) => (
-            <div
+            <Link
               key={key}
+              href="/consultation"
               data-card
               data-delay={i * 100}
-              className="reveal group rounded-3xl border border-[#C4A24D]/12 bg-[#1C2B4A] p-8 sm:p-10 hover:border-[#C4A24D]/40 hover:shadow-2xl hover:shadow-[#C4A24D]/8 hover:-translate-y-1 transition-all duration-400 cursor-default"
+              className="reveal group rounded-3xl border border-[#C4A24D]/12 bg-[#1C2B4A] p-8 sm:p-10 hover:border-[#C4A24D]/40 hover:shadow-2xl hover:shadow-[#C4A24D]/8 hover:-translate-y-1 transition-all duration-400"
             >
-              {/* Icon */}
               <div className="w-14 h-14 mb-6 flex items-center justify-center rounded-2xl bg-[#C4A24D]/10 border border-[#C4A24D]/20 group-hover:bg-[#C4A24D]/20 transition-colors duration-300">
                 <Icon size={26} className="text-[#C4A24D]" />
               </div>
@@ -64,9 +69,11 @@ export function Services() {
                 {t(`${key}Desc`)}
               </p>
 
-              {/* Bottom accent */}
-              <div className="mt-6 w-8 h-0.5 bg-[#C4A24D]/40 group-hover:w-16 group-hover:bg-[#C4A24D] transition-all duration-400" />
-            </div>
+              <div className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-[#D4B86A]">
+                {t('consultCta')}
+                <Arrow size={14} className="group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
           ))}
         </div>
       </div>

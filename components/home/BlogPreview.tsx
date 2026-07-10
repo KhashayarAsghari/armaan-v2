@@ -8,7 +8,6 @@ const posts = [
   {
     slug: 'legal-challenges-import-export',
     date: '۱۴۰۵/۳/۴',
-    image: '/blog-1.jpg',
     titleFa: 'چالش‌های حقوقی کلیدی در قراردادهای واردات و صادرات که ۵ شرکت‌ها نادیده می‌گیرند',
     titleEn: '5 Key Legal Challenges in Import/Export Contracts Companies Overlook',
     titleAr: '٥ تحديات قانونية رئيسية في عقود الاستيراد والتصدير تتجاهلها الشركات',
@@ -19,7 +18,6 @@ const posts = [
   {
     slug: 'customs-clearance-guide',
     date: '۱۴۰۵/۲/۱۸',
-    image: '/blog-2.jpg',
     titleFa: 'راهنمای کامل ترخیص کالا از گمرک: مراحل، مدارک و نکات کلیدی',
     titleEn: 'Complete Guide to Customs Clearance: Steps, Documents & Key Tips',
     titleAr: 'الدليل الشامل لتخليص البضائع جمركياً: الخطوات والوثائق والنصائح الأساسية',
@@ -30,7 +28,6 @@ const posts = [
   {
     slug: 'trade-card-epl',
     date: '۱۴۰۵/۱/۲۸',
-    image: '/blog-3.jpg',
     titleFa: 'کارت بازرگانی و EPL: همه چیزی که باید بدانید',
     titleEn: 'Trade Card & EPL: Everything You Need to Know',
     titleAr: 'بطاقة التجارة وEPL: كل ما تحتاج معرفته',
@@ -109,7 +106,14 @@ export function BlogPreview() {
               <div className="relative h-48 overflow-hidden bg-[#1C2B4A]">
                 <div
                   className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700"
-                  style={{ backgroundImage: `url(${post.image}), linear-gradient(135deg, #1C2B4A, #0d0d0d)` }}
+                  style={{
+                    backgroundImage:
+                      i % 3 === 0
+                        ? 'linear-gradient(135deg, #1C2B4A, #0d0d0d)'
+                        : i % 3 === 1
+                          ? 'linear-gradient(135deg, #13233f, #0f172a)'
+                          : 'linear-gradient(135deg, #2d1f0f, #0f172a)',
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               </div>

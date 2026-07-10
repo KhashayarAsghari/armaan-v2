@@ -8,43 +8,95 @@
     "consultation": "Request Consultation"
   },
   "hero": {
-    "title": "A Legal Partner That Actually Delivers",
-    "subtitle": "Innovative Contracts / Legal Services / Trade Consulting / Customs Services",
-    "cta": "Start Collaboration",
-    "trusted": "Trusted by 500+ Companies"
+    "title": "Global Trade, Professionally Managed",
+    "subtitle": "Do not worry about details. We handle everything from market analysis and banking/currency processes to full customs execution and legal contract monitoring. Stay focused on your business; we move the path forward with clarity, security, and reliability.",
+    "cta": "Get Consultation",
+    "secondaryCta": "More Than a Broker",
+    "trusted": "SarAmad Armaan Brokerage"
   },
   "about": {
     "title": "More Than a Broker",
-    "subtitle": "A specialist team for fast, accurate, and compliant clearance. You need smart tools and expert people. We have both.",
-    "stats": {
-      "years": "Years of Experience",
-      "clients": "Satisfied Clients",
-      "cases": "Successful Cases",
-      "countries": "Countries Covered"
-    },
-    "card1Title": "Professional Customs Services",
-    "card1Desc": "With over 10 years of experience in cargo clearance and customs affairs, our team is ready to provide the best services. From initial consultation to final delivery, we are by your side.",
-    "card2Title": "Smart Trade Solutions",
-    "card2Desc": "Using the latest technologies and intelligent systems to speed up and simplify customs processes. Our online platform provides real-time tracking of your shipments."
+    "subtitle": "Banking, customs, and legal operations are the three highest-risk points in trade and we keep them under control for you. With a specialized team, your trade process remains unified, standardized, and controlled.",
+    "card1Title": "Smart Risk Management",
+    "card1Desc": "Previous text",
+    "card1Cta": "Go to consultation page",
+    "card2Title": "Direct and Simple Communication",
+    "card2Desc": "Just one call is enough; our legal, customs, and technical team will support you.",
+    "card2Cta": "Go to contact page"
   },
   "services": {
-    "title": "Our Market, Our Services",
-    "s1Title": "International Sourcing, Freight & Transit",
-    "s1Desc": "From order registration to final delivery — every step of foreign trade in one structured, trackable system",
-    "s2Title": "Specialized Customs & Cargo Clearance",
-    "s2Desc": "Fast, reliable clearance in full compliance with current customs regulations",
-    "s3Title": "Legal Advisory & Commercial Contract Management",
-    "s3Desc": "From drafting contracts to resolving customs disputes, we stand by your side",
-    "s4Title": "Integrated Foreign Trade Management",
-    "s4Desc": "Quotation, transit, EPL, trade card, order registration — all in one coordinated intelligent system"
+    "title": "Our Services",
+    "s1Title": "Specialized Customs & Cargo Clearance",
+    "s1Desc": "Current text",
+    "s2Title": "International Transportation & Logistics",
+    "s2Desc": "Transport coordination and post-order procedures are managed from origin to final destination in a centralized, trackable, and uninterrupted flow.",
+    "s3Title": "Legal Advisory & Contract Management",
+    "s3Desc": "From negotiations and correspondence to drafting contracts and resolving customs disputes, we stand by your side.",
+    "s4Title": "Direct and Reliable Legal Defense",
+    "s4Desc": "Legal representation and defense in international trade cases, domestic commercial disputes, corporate claims, and currency commitment release. Beyond advisory, we ensure legal execution toward worry-free trade.",
+    "s5Title": "Integrated Foreign Trade Management",
+    "s5Desc": "Trade card, order registration, customs procedures, commercial systems, adjacent organizations and more in one coordinated and integrated system.",
+    "consultCta": "Go to consultation page"
   },
   "blog": {
-    "title": "Blog",
-    "viewAll": "View All",
+    "title": "Latest News",
+    "viewAll": "View",
     "readMore": "Read More"
   },
-  "testimonials": {
-    "title": "What Our Clients Say"
+  "announcements": {
+    "title": "Announcements",
+    "item1": "Announcement No. 1",
+    "item2": "Announcement No. 1",
+    "item3": "Announcement No. 1",
+    "seminarsTitle": "Seminars and Specialized Foreign Trade Workshops",
+    "seminarsDesc": "View educational media including images, videos, audio, and supporting materials.",
+    "seminarsCta": "View"
+  },
+  "whyChoose": {
+    "title": "Why Clients Choose Us",
+    "r1Title": "Expert Management and Supervision of Contracts and Legal Procedures",
+    "r1Desc": "Delivered by a professional team led by a court attorney and an official customs broker, fluent in English and specialized in international trade.",
+    "r2Title": "Centralized and Precise Process Control",
+    "r2Desc": "With an integrated approach that combines legal and customs expertise at every stage of trade.",
+    "r3Title": "Regulatory Compliance with Lower Risk and Cost",
+    "r3Desc": "Ensuring full compliance with domestic and international regulations for secure and efficient trade.",
+    "r4Title": "Comprehensive Support Until Final Outcome",
+    "r4Desc": "Practical, decision-oriented support beyond routine formalities, until your real business objective is achieved."
+  },
+  "team": {
+    "title": "Our Team Is Your Team",
+    "subtitle": "We do not just promise; we deliver.",
+    "ceoTitle": "Javad Nodehi - CEO",
+    "ceoQuote": "At every stage of trade, from correspondence, negotiations, and contracts to customs and legal procedures, our active presence and precise oversight ensure a transparent, secure, and successful path. Our mission goes beyond formalities; we deliver tangible and sustainable results for clients.",
+    "ceoName": "Javad Nodehi - CEO",
+    "member2": {
+      "name": "Team Member 2",
+      "role": "Name + Role"
+    },
+    "member3": {
+      "name": "Team Member 3",
+      "role": "Name + Role"
+    },
+    "member4": {
+      "name": "Team Member 4",
+      "role": "Name + Role"
+    }
+  },
+  "tutorialsPage": {
+    "title": "Education Page",
+    "subtitle": "Multimedia educational content including photos, videos, and audio files will be published here.",
+    "item1": {
+      "title": "Specialized Workshop 1",
+      "desc": "Practical educational content for managing foreign trade processes."
+    },
+    "item2": {
+      "title": "Specialized Workshop 2",
+      "desc": "Operational samples and real-case experiences from trade projects."
+    },
+    "item3": {
+      "title": "Specialized Workshop 3",
+      "desc": "Training on legal, customs, and banking points with a focus on risk reduction."
+    }
   },
   "contact": {
     "title": "Contact Us",
@@ -61,6 +113,92 @@
     "phoneValue": "+98 21 8888 8888",
     "emailLabel": "Email",
     "emailValue": "info@armaan-legal.com"
+  },
+  "consultationPage": {
+    "title": "Consultation Request",
+    "subtitle": "Complete the form below and SarAmad Armaan experts will contact you as soon as possible based on your case details.",
+    "services": {
+      "title": "Select Your Required Service",
+      "customsItems": {
+        "item1": "Customs clearance procedures",
+        "item2": "Customs valuation of goods",
+        "item3": "Customs tariff classification",
+        "item4": "Representation in customs dispute resolution commissions",
+        "item5": "Obtaining legal permits",
+        "item6": "Order registration",
+        "item7": "Currency transfer management",
+        "item8": "Opening letters of credit",
+        "item9": "Cargo inspection"
+      },
+      "options": {
+        "customsBrokerage": {
+          "label": "Customs Brokerage",
+          "heading": "1- Customs Brokerage"
+        },
+        "tradeConsulting": {
+          "label": "Trade Consulting",
+          "heading": "2- Trade Consulting",
+          "description": "Submit your request for market development, import/export operations, order registration, and execution-level commercial decisions."
+        },
+        "legalConsulting": {
+          "label": "Legal Consulting",
+          "heading": "3- Legal Consulting",
+          "description": "Register legal consultation requests for contract review, commercial disputes, customs legal matters, and legal follow-up."
+        },
+        "transportServices": {
+          "label": "Transportation Services",
+          "heading": "4- Transportation Services",
+          "description": "Get consultation on domestic and international transportation, route coordination, scheduling, shipping documents, and secure delivery."
+        },
+        "specializedTraining": {
+          "label": "Specialized Training",
+          "heading": "5- Specialized Training",
+          "description": "Submit your request for specialized training in customs, foreign trade, and organizational execution workflows."
+        }
+      }
+    },
+    "form": {
+      "subjectLabel": "Detailed Consultation Subject:",
+      "subjectPlaceholder": "Enter your exact consultation subject in this field.",
+      "applicantInfo": "Applicant Basic Information",
+      "fullName": "Full Name:",
+      "companyName": "Company Name (if any):",
+      "phone": "Phone Number:",
+      "email": "Email:",
+      "city": "City of residence or activity:"
+    },
+    "upload": {
+      "title": "Document Upload (Optional but Recommended)",
+      "description": "You can upload supporting documents related to your case or topic:",
+      "rules": "📎 Upload: PDF, JPG, DOC | Maximum 5 files | Up to 5 MB each",
+      "button": "Upload File",
+      "remove": "Remove",
+      "uploadLink": "Upload Link:",
+      "filesListTitle": "Uploaded files",
+      "noFiles": "No file selected.",
+      "fileValidation": {
+        "maxFiles": "You can select up to 5 files.",
+        "maxSize": "Each file must be up to 5 MB.",
+        "type": "Allowed file types are PDF, JPG, or DOC."
+      }
+    },
+    "response": {
+      "title": "🔹 Preferred Response Method",
+      "methods": {
+        "phone": "Phone Call",
+        "online": "Online Consultation",
+        "inPerson": "In-person Consultation"
+      },
+      "validation": "Select at least one response method."
+    },
+    "confirm": {
+      "title": "Confirmation & Submit",
+      "text": "By submitting this form, I confirm that the provided information is accurate and I authorize the company experts to contact me.",
+      "validation": "You must accept the confirmation to submit the form."
+    },
+    "submit": "Submit Form",
+    "successMessage": "Thank you for your trust. SarAmad Armaan experts will review your information and contact you at the earliest opportunity. You can also send additional documents via WhatsApp to 09123491879.",
+    "submitError": "Form submission failed. Please try again."
   },
   "footer": {
     "rights": "All rights reserved",

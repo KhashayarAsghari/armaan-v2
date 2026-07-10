@@ -60,3 +60,27 @@ export const contacts = mysqlTable('contacts', {
   read: boolean('read').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+export const consultationRequests = mysqlTable('consultation_requests', {
+  id: serial('id').primaryKey(),
+  locale: mysqlEnum('locale', ['fa', 'en', 'ar']).default('fa').notNull(),
+  serviceType: mysqlEnum('service_type', [
+    'customsBrokerage',
+    'tradeConsulting',
+    'legalConsulting',
+    'transportServices',
+    'specializedTraining',
+  ]).notNull(),
+  subject: text('subject').notNull(),
+  fullName: varchar('full_name', { length: 255 }).notNull(),
+  companyName: varchar('company_name', { length: 255 }),
+  phone: varchar('phone', { length: 50 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull(),
+  city: varchar('city', { length: 255 }).notNull(),
+  responseMethods: text('response_methods').notNull(),
+  uploadLink: varchar('upload_link', { length: 1024 }),
+  uploadedFiles: longtext('uploaded_files'),
+  consent: boolean('consent').default(true).notNull(),
+  read: boolean('read').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
