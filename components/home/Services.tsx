@@ -40,7 +40,7 @@ export function Services() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-24 px-4 sm:px-6 lg:px-10 bg-background">
+    <section ref={sectionRef} id="services" className="py-24 px-4 sm:px-6 lg:px-10 bg-background">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">

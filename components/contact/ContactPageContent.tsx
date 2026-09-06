@@ -17,6 +17,7 @@ import {
   Smartphone,
 } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
+import { siteConfig } from '@/lib/config';
 
 const schema = z.object({
   name: z.string().min(2),
@@ -28,28 +29,35 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const quickMenu = [
-  { label: '091212345678', href: 'tel:091212345678', external: true },
+  { label: siteConfig.mobile, href: `tel:${siteConfig.mobile}`, external: true },
   { label: 'مشاوره بگیرید...', href: '/consultation', external: false },
   { label: 'تماس با ما ...', href: '/contact#contact-form', external: false },
 ];
 
 const contactDetails = [
-  {
-    label: 'آدرس',
-    value: 'بجنورد، طالقانی شرقی، مجتمع تجاری آرمانی، طبقه اول، پلاک 41',
-    icon: MapPin,
-  },
-  { label: 'تلفن', value: '05832721251', icon: Phone },
-  { label: 'موبایل', value: '09123491879', icon: Smartphone },
-  { label: 'ایمیل', value: 'info@armanco.com', icon: Mail },
+  { label: 'آدرس', value: siteConfig.address, icon: MapPin },
+  { label: 'تلفن', value: siteConfig.phone, icon: Phone },
+  { label: 'موبایل', value: siteConfig.mobile, icon: Smartphone },
+  { label: 'ایمیل', value: siteConfig.email, icon: Mail },
 ];
 
+function handleFromUrl(url: string) {
+  try {
+    const path = new URL(url).pathname.replace(/^\/+|\/+$/g, '');
+    return path || url;
+  } catch {
+    return url;
+  }
+}
+
 const socials = [
-  { label: 'اینستاگرام', value: 'arman', href: 'https://instagram.com/arman', icon: Rss },
-  { label: 'لینکدین', value: 'arman', href: 'https://linkedin.com/in/arman', icon: Globe },
-  { label: 'تلگرام', value: 'arman', href: 'https://t.me/arman', icon: Send },
-  { label: 'فیس بوک', value: 'arman', href: 'https://facebook.com/arman', icon: MessageCircle },
-];
+  { label: 'اینستاگرام', href: siteConfig.social.instagram, icon: Rss },
+  { label: 'لینکدین', href: siteConfig.social.linkedin, icon: Globe },
+  { label: 'تلگرام', href: siteConfig.social.telegram, icon: Send },
+  { label: 'فیس بوک', href: siteConfig.social.facebook, icon: MessageCircle },
+]
+  .filter((s) => s.href)
+  .map((s) => ({ ...s, value: handleFromUrl(s.href) }));
 
 export function ContactPageContent() {
   const [success, setSuccess] = useState(false);
@@ -246,13 +254,19 @@ export function ContactPageContent() {
                 <MessageCircle size={17} className="text-[#C4A24D]" />
                 <p className="text-sm font-semibold text-foreground">لوکیشن: نقشه گوگل مپ</p>
               </div>
-              <iframe
-                title="Arman Company Location"
-                src="https://www.google.com/maps?q=%D8%A8%D8%AC%D9%86%D9%88%D8%B1%D8%AF%D8%8C%20%D8%B7%D8%A7%D9%84%D9%82%D8%A7%D9%86%DB%8C%20%D8%B4%D8%B1%D9%82%DB%8C%D8%8C%20%D9%85%D8%AC%D8%AA%D9%85%D8%B9%20%D8%AA%D8%AC%D8%A7%D8%B1%DB%8C%20%D8%A2%D8%B1%D9%85%D8%A7%D9%86%DB%8C%20%D8%B7%D8%A8%D9%82%D9%87%20%D8%A7%D9%88%D9%84%20%D9%BE%D9%84%D8%A7%DA%A9%2041&output=embed"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                className="h-72 w-full"
-              />
+              {siteConfig.mapsEmbedUrl ? (
+                <iframe
+                  title="Arman Company Location"
+                  src={siteConfig.mapsEmbedUrl}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="h-72 w-full"
+                />
+              ) : (
+                <div className="h-72 w-full flex items-center justify-center text-sm text-muted-foreground">
+                  نقشه تنظیم نشده است
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -3,6 +3,8 @@ import { db } from '@/lib/db';
 import { posts, postTranslations } from '@/lib/schema';
 import { eq, desc } from 'drizzle-orm';
 import { z } from 'zod';
+import { requireAuth } from '@/lib/require-auth';
+import { getSessionFromRequest } from '@/lib/auth';
 
 const translationSchema = z.object({
   title: z.string().max(500).default(''),
@@ -18,6 +20,9 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  const authError = await requireAuth(req);
+  if (authError) return authError;
+
   try {
     const body = await req.json();
     const data = schema.parse(body);
@@ -56,9 +61,12 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    // Fetch posts with their Persian translation for the admin list
+    // Public callers (no valid admin session) may only ever see published posts.
+    const session = await getSessionFromRequest(req);
+    const isAdmin = !!session;
+
     const rows = await db
       .select({
         id: posts.id,
@@ -73,6 +81,7 @@ export async function GET() {
         postTranslations,
         eq(postTranslations.postId, posts.id)
       )
+      .where(isAdmin ? undefined : eq(posts.published, true))
       .orderBy(desc(posts.createdAt));
 
     // Collapse: one row per post (take first fa translation title found)

@@ -1,11 +1,13 @@
 'use client';
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Phone, Mail, MapPin, Send, Rss, MessageCircle } from 'lucide-react';
+import { siteConfig } from '@/lib/config';
 
 export function Footer() {
   const t = useTranslations();
+  const locale = useLocale() as 'fa' | 'en' | 'ar';
 
   return (
     <footer className="border-t border-white/8 bg-background">
@@ -18,8 +20,8 @@ export function Footer() {
                 <Image src="/logo.svg" alt="Armaan Legal" fill className="object-contain" />
               </div>
               <div>
-                <p className="font-bold text-foreground">{t('footer.company')}</p>
-                <p className="text-xs text-muted-foreground">Legal & Trade Consultancy</p>
+                <p className="font-bold text-foreground">{siteConfig.companyName[locale]}</p>
+                <p className="text-xs text-muted-foreground">{t('footer.tagline')}</p>
               </div>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
@@ -27,18 +29,22 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-3 mt-2">
               {[
-                { icon: Send, href: '#' },
-                { icon: Rss, href: '#' },
-                { icon: MessageCircle, href: '#' },
-              ].map(({ icon: Icon, href }, i) => (
-                <a
-                  key={i}
-                  href={href}
-                  className="w-9 h-9 flex items-center justify-center rounded-full border border-white/12 hover:border-[#C4A24D]/60 hover:bg-[#C4A24D]/10 text-muted-foreground hover:text-[#C4A24D] transition-all duration-300"
-                >
-                  <Icon size={15} />
-                </a>
-              ))}
+                { icon: Send, href: siteConfig.social.telegram },
+                { icon: Rss, href: siteConfig.social.instagram },
+                { icon: MessageCircle, href: siteConfig.social.facebook },
+              ]
+                .filter((s) => s.href)
+                .map(({ icon: Icon, href }, i) => (
+                  <a
+                    key={i}
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-9 h-9 flex items-center justify-center rounded-full border border-white/12 hover:border-[#C4A24D]/60 hover:bg-[#C4A24D]/10 text-muted-foreground hover:text-[#C4A24D] transition-all duration-300"
+                  >
+                    <Icon size={15} />
+                  </a>
+                ))}
             </div>
           </div>
 
@@ -49,7 +55,7 @@ export function Footer() {
             </h4>
             {[
               { href: '/about', label: t('nav.about') },
-              { href: '/services', label: t('nav.services') },
+              { href: '/#services', label: t('nav.services') },
               { href: '/blog', label: t('nav.blog') },
               { href: '/contact', label: t('nav.contact') },
             ].map((link) => (
@@ -69,10 +75,10 @@ export function Footer() {
               {t('nav.contact')}
             </h4>
             {[
-              { icon: MapPin, text: t('contact.addressValue') },
-              { icon: Phone, text: t('contact.phoneValue') },
-              { icon: Mail, text: t('contact.emailValue') },
-            ].map(({ icon: Icon, text }, i) => (
+              { icon: MapPin, text: siteConfig.address },
+              { icon: Phone, text: siteConfig.phone },
+              { icon: Mail, text: siteConfig.email },
+            ].filter((c) => c.text).map(({ icon: Icon, text }, i) => (
               <div key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
                 <Icon size={15} className="text-[#C4A24D] mt-0.5 shrink-0" />
                 <span>{text}</span>
@@ -83,7 +89,7 @@ export function Footer() {
 
         {/* Bottom */}
         <div className="mt-14 pt-6 border-t border-white/8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} {t('footer.company')}. {t('footer.rights')}.</p>
+          <p>© {new Date().getFullYear()} {siteConfig.companyName[locale]}. {t('footer.rights')}.</p>
           <div className="gold-divider w-20" />
         </div>
       </div>

@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   Truck,
 } from 'lucide-react';
+import { siteConfig } from '@/lib/config';
 
 type ServiceKey =
   | 'customsBrokerage'
@@ -76,7 +77,7 @@ export function ConsultationPageContent() {
     resolver: zodResolver(schema),
     defaultValues: {
       responseMethods: [],
-      confirm: false,
+      confirm: false as true,
     },
   });
 
@@ -245,7 +246,9 @@ export function ConsultationPageContent() {
           {success ? (
             <div className="flex min-h-72 flex-col items-center justify-center gap-4 text-center">
               <CheckCircle2 size={56} className="text-[#C4A24D]" />
-              <p className="max-w-3xl text-sm leading-8 text-foreground sm:text-base">{t('successMessage')}</p>
+              <p className="max-w-3xl text-sm leading-8 text-foreground sm:text-base">
+                {t('successMessage', { whatsapp: siteConfig.whatsapp })}
+              </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-7">

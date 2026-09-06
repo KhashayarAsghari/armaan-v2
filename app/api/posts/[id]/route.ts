@@ -3,11 +3,15 @@ import { db } from '@/lib/db';
 import { posts, postTranslations } from '@/lib/schema';
 import { eq, and, ne } from 'drizzle-orm';
 import { z } from 'zod';
+import { requireAuth } from '@/lib/require-auth';
 
 type Params = { params: Promise<{ id: string }> };
 
 // ── GET /api/posts/[id] ──────────────────────────────────────────────────────
-export async function GET(_req: NextRequest, { params }: Params) {
+export async function GET(req: NextRequest, { params }: Params) {
+  const authError = await requireAuth(req);
+  if (authError) return authError;
+
   try {
     const { id } = await params;
     const postId = Number(id);
@@ -42,6 +46,9 @@ const updateSchema = z.object({
 });
 
 export async function PUT(req: NextRequest, { params }: Params) {
+  const authError = await requireAuth(req);
+  if (authError) return authError;
+
   try {
     const { id } = await params;
     const postId = Number(id);
@@ -97,7 +104,10 @@ export async function PUT(req: NextRequest, { params }: Params) {
 }
 
 // ── DELETE /api/posts/[id] ───────────────────────────────────────────────────
-export async function DELETE(_req: NextRequest, { params }: Params) {
+export async function DELETE(req: NextRequest, { params }: Params) {
+  const authError = await requireAuth(req);
+  if (authError) return authError;
+
   try {
     const { id } = await params;
     const postId = Number(id);

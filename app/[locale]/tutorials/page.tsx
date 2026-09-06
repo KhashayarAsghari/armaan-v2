@@ -2,6 +2,11 @@ import { setRequestLocale } from 'next-intl/server';
 import { getTranslations } from 'next-intl/server';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
+import { GraduationCap } from 'lucide-react';
+import { Link } from '@/i18n/navigation';
+import { getPublishedPosts, type Locale } from '@/lib/posts';
+
+export const revalidate = 300;
 
 export default async function TutorialsPage({
   params,
@@ -11,6 +16,8 @@ export default async function TutorialsPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('tutorialsPage');
+
+  const tutorials = await getPublishedPosts('tutorial', locale as Locale);
 
   return (
     <main className="flex min-h-screen flex-col">
@@ -23,15 +30,28 @@ export default async function TutorialsPage({
             <p className="text-muted-foreground">{t('subtitle')}</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {['item1', 'item2', 'item3'].map((item) => (
-              <div key={item} className="rounded-3xl border border-white/8 bg-card p-6">
-                <div className="h-36 rounded-2xl bg-[#1C2B4A]/80 mb-4" />
-                <h2 className="text-lg font-bold text-foreground mb-2">{t(`${item}.title`)}</h2>
-                <p className="text-sm text-muted-foreground leading-7">{t(`${item}.desc`)}</p>
-              </div>
-            ))}
-          </div>
+          {tutorials.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 rounded-3xl border border-dashed border-white/10 text-muted-foreground gap-3">
+              <GraduationCap size={32} className="opacity-40" />
+              <p className="text-sm">{t('empty')}</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {tutorials.map((item) => (
+                <Link
+                  key={item.slug}
+                  href={`/blog/${item.slug}`}
+                  className="rounded-3xl border border-white/8 bg-card p-6 hover:border-[#C4A24D]/30 transition-colors"
+                >
+                  <div className="h-36 rounded-2xl bg-[#1C2B4A]/80 mb-4" />
+                  <h2 className="text-lg font-bold text-foreground mb-2 line-clamp-2">{item.title}</h2>
+                  {item.excerpt && (
+                    <p className="text-sm text-muted-foreground leading-7 line-clamp-3">{item.excerpt}</p>
+                  )}
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
       <Footer />

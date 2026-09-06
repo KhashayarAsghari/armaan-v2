@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { contacts } from '@/lib/schema';
 import { z } from 'zod';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 const schema = z.object({
   name: z.string().min(2).max(255),
@@ -11,6 +12,12 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  // 5 submissions / 10 minutes per IP — enough for a legitimate visitor, blocks spam bursts.
+  const { allowed } = rateLimit(`contact:${getClientIp(req)}`, 5, 10 * 60 * 1000);
+  if (!allowed) {
+    return NextResponse.json({ error: 'تعداد درخواست‌ها زیاد است. کمی بعد دوباره تلاش کنید.' }, { status: 429 });
+  }
+
   try {
     const body = await req.json();
     const data = schema.parse(body);

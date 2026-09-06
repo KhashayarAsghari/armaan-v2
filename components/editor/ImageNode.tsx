@@ -6,7 +6,6 @@ import {
   type DOMConversionMap,
   type DOMConversionOutput,
   type DOMExportOutput,
-  type EditorConfig,
   type LexicalEditor,
   type LexicalNode,
   type NodeKey,
@@ -317,7 +316,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     return { element: el };
   }
 
-  createDOM(_config: EditorConfig): HTMLElement {
+  createDOM(): HTMLElement {
     const span = document.createElement('span');
     span.style.display = 'block';
     return span;

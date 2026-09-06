@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { consultationRequests } from '@/lib/schema';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 const uploadedFileSchema = z.object({
   name: z.string().min(1).max(255),
@@ -32,6 +33,11 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  const { allowed } = rateLimit(`consultation:${getClientIp(req)}`, 5, 10 * 60 * 1000);
+  if (!allowed) {
+    return NextResponse.json({ error: 'تعداد درخواست‌ها زیاد است. کمی بعد دوباره تلاش کنید.' }, { status: 429 });
+  }
+
   try {
     const body = await req.json();
     const data = schema.parse(body);

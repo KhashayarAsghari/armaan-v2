@@ -2,13 +2,15 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { Menu, X } from 'lucide-react';
+import { siteConfig } from '@/lib/config';
 
 export function Navbar() {
   const t = useTranslations('nav');
+  const locale = useLocale() as 'fa' | 'en' | 'ar';
   const [mobileOpen, setMobileOpen] = useState(false);
   const [navSticky, setNavSticky] = useState(false);
 
@@ -26,7 +28,7 @@ export function Navbar() {
   const navLinks = [
     { href: '/', label: t('home') },
     { href: '/about', label: t('about') },
-    { href: '/services', label: t('services') },
+    { href: '/#services', label: t('services') },
     { href: '/blog', label: t('blog') },
     { href: '/contact', label: t('contact') },
   ];
@@ -53,7 +55,7 @@ export function Navbar() {
                 priority
               />
             </div>
-            <span className="text-sm font-semibold text-foreground hidden sm:block">دفتر حقوقی آرمان</span>
+            <span className="text-sm font-semibold text-foreground hidden sm:block">{siteConfig.companyName[locale]}</span>
           </Link>
 
           {/* Desktop controls */}

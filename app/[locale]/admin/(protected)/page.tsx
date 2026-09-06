@@ -1,5 +1,8 @@
 import { setRequestLocale } from 'next-intl/server';
-import { FileText, MessageSquare, Eye } from 'lucide-react';
+import { FileText, MessageSquare, ClipboardList } from 'lucide-react';
+import { db } from '@/lib/db';
+import { posts, contacts, consultationRequests } from '@/lib/schema';
+import { count, eq } from 'drizzle-orm';
 
 export default async function AdminDashboardPage({
   params,
@@ -9,10 +12,16 @@ export default async function AdminDashboardPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const [[publishedPosts], [unreadContacts], [unreadConsultations]] = await Promise.all([
+    db.select({ value: count() }).from(posts).where(eq(posts.published, true)),
+    db.select({ value: count() }).from(contacts).where(eq(contacts.read, false)),
+    db.select({ value: count() }).from(consultationRequests).where(eq(consultationRequests.read, false)),
+  ]);
+
   const cards = [
-    { icon: FileText, label: 'مقالات منتشر شده', value: '—' },
-    { icon: MessageSquare, label: 'پیام‌های دریافتی', value: '—' },
-    { icon: Eye, label: 'بازدید این ماه', value: '—' },
+    { icon: FileText, label: 'مقالات منتشر شده', value: String(publishedPosts?.value ?? 0) },
+    { icon: MessageSquare, label: 'پیام‌های خوانده‌نشده', value: String(unreadContacts?.value ?? 0) },
+    { icon: ClipboardList, label: 'درخواست‌های مشاوره خوانده‌نشده', value: String(unreadConsultations?.value ?? 0) },
   ];
 
   return (
@@ -35,7 +44,7 @@ export default async function AdminDashboardPage({
 
       <div className="rounded-2xl border border-border bg-card p-6">
         <p className="text-sm text-muted-foreground">
-          پنل مدیریت در حال توسعه است. برای ایجاد مقاله جدید از منوی سمت چپ اقدام کنید.
+          برای ایجاد مقاله جدید از منوی سمت چپ اقدام کنید.
         </p>
       </div>
     </div>

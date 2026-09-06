@@ -1,9 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { contacts } from '@/lib/schema';
 import { desc } from 'drizzle-orm';
+import { requireAuth } from '@/lib/require-auth';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const authError = await requireAuth(req);
+  if (authError) return authError;
+
   try {
     const rows = await db
       .select()

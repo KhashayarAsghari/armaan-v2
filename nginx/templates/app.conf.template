@@ -1,0 +1,61 @@
+# Templated by the official nginx image entrypoint (envsubst) using the
+# $DOMAIN env var set in docker-compose.yml. Output lands in
+# /etc/nginx/conf.d/app.conf inside the container — do not edit that directly,
+# edit this file instead.
+
+# ── HTTP: ACME challenge + redirect everything else to HTTPS ────────────────
+server {
+  listen 80;
+  listen [::]:80;
+  server_name ${DOMAIN};
+
+  # Required for certbot's webroot challenge (see nginx/init-letsencrypt.sh).
+  location /.well-known/acme-challenge/ {
+    root /var/www/certbot;
+  }
+
+  location / {
+    return 301 https://$host$request_uri;
+  }
+}
+
+# ── HTTPS: reverse proxy to the Next.js app ─────────────────────────────────
+server {
+  listen 443 ssl;
+  listen [::]:443 ssl;
+  http2 on;
+  server_name ${DOMAIN};
+
+  ssl_certificate     /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/${DOMAIN}/privkey.pem;
+
+  # Security headers (defense in depth — the app also sets some of these
+  # in next.config.ts, but setting them at the edge covers error pages too).
+  add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+  add_header X-Frame-Options "SAMEORIGIN" always;
+  add_header X-Content-Type-Options "nosniff" always;
+  add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+  add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+
+  limit_conn conn_limit 20;
+
+  # Slow down brute-force attempts against the admin login page/API a bit
+  # more than the general rate at the edge, before it even reaches Next.js.
+  location ~ ^/(?:[a-z]{2}/)?admin/login {
+    limit_req zone=login_limit burst=10 nodelay;
+    proxy_pass http://app:3000;
+    include /etc/nginx/conf.d/proxy-common.conf;
+  }
+
+  location ~ ^/api/auth/login {
+    limit_req zone=login_limit burst=10 nodelay;
+    proxy_pass http://app:3000;
+    include /etc/nginx/conf.d/proxy-common.conf;
+  }
+
+  location / {
+    limit_req zone=general_limit burst=40 nodelay;
+    proxy_pass http://app:3000;
+    include /etc/nginx/conf.d/proxy-common.conf;
+  }
+}

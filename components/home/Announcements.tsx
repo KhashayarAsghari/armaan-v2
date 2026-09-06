@@ -4,8 +4,9 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { ArrowLeft, ArrowRight, Megaphone, Presentation } from 'lucide-react';
 import { useLocale } from 'next-intl';
+import type { PostSummary } from '@/lib/posts';
 
-export function Announcements() {
+export function Announcements({ posts }: { posts: PostSummary[] }) {
   const t = useTranslations('announcements');
   const locale = useLocale();
   const Arrow = locale === 'en' ? ArrowRight : ArrowLeft;
@@ -18,16 +19,21 @@ export function Announcements() {
             <Megaphone size={18} />
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-5">{t('title')}</h2>
-          <div className="space-y-3">
-            {['item1', 'item2', 'item3'].map((item) => (
-              <div
-                key={item}
-                className="rounded-xl border border-white/8 bg-background/70 px-4 py-3 text-sm text-foreground"
-              >
-                {t(item)}
-              </div>
-            ))}
-          </div>
+          {posts.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t('empty')}</p>
+          ) : (
+            <div className="space-y-3">
+              {posts.map((post) => (
+                <Link
+                  key={post.slug}
+                  href={`/blog/${post.slug}`}
+                  className="block rounded-xl border border-white/8 bg-background/70 px-4 py-3 text-sm text-foreground hover:border-[#C4A24D]/30 transition-colors"
+                >
+                  {post.title}
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="lg:col-span-7 rounded-3xl border border-white/8 bg-[#1C2B4A] p-7 sm:p-8 text-white">

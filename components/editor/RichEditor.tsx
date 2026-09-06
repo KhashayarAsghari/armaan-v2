@@ -8,14 +8,15 @@ import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $generateHtmlFromNodes } from '@lexical/html';
-import { $getRoot } from 'lexical';
+import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
+import { $getRoot, $insertNodes, type LexicalEditor } from 'lexical';
 import { HeadingNode, QuoteNode, $createHeadingNode } from '@lexical/rich-text';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { LinkNode, AutoLinkNode } from '@lexical/link';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import { CodeNode, CodeHighlightNode } from '@lexical/code';
 import { ImageNode, $createImageNode } from './ImageNode';
+import { VideoNode, $createVideoNode } from './VideoNode';
 import {
   FORMAT_TEXT_COMMAND,
   FORMAT_ELEMENT_COMMAND,
@@ -27,8 +28,12 @@ import {
   Bold, Italic, Underline, Strikethrough,
   List, ListOrdered,
   AlignRight, AlignLeft, AlignCenter,
-  Undo, Redo, Image as ImageIcon, Code,
+  Undo, Redo, Image as ImageIcon, Video as VideoIcon, Code,
 } from 'lucide-react';
+
+const MAX_IMAGE_SIZE = 8 * 1024 * 1024; // 8 MB — keep in sync with app/api/upload/route.ts
+const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100 MB — keep in sync with app/api/upload/route.ts
+const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-matroska'];
 
 // ── Toolbar ────────────────────────────────────────────────────────────────────
 function Toolbar() {
@@ -44,21 +49,59 @@ function Toolbar() {
       $getRoot().append(heading);
     });
 
-  async function handleImageInsert() {
+  async function uploadFile(file: File): Promise<{ url: string; type: 'image' | 'video' } | null> {
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await fetch('/api/upload', { method: 'POST', body: fd });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      window.alert(body.error ?? 'آپلود فایل با خطا مواجه شد.');
+      return null;
+    }
+    return (await res.json()) as { url: string; type: 'image' | 'video' };
+  }
+
+  function handleImageInsert() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
     input.onchange = async () => {
       const file = input.files?.[0];
       if (!file) return;
-      const fd = new FormData();
-      fd.append('file', file);
-      const res = await fetch('/api/upload', { method: 'POST', body: fd });
-      if (!res.ok) return;
-      const { url } = (await res.json()) as { url: string };
+      if (file.size > MAX_IMAGE_SIZE) {
+        window.alert('حجم تصویر نباید بیشتر از ۸ مگابایت باشد.');
+        return;
+      }
+      const result = await uploadFile(file);
+      if (!result) return;
       editor.update(() => {
-        const imageNode = $createImageNode({ src: url, altText: file.name });
+        const imageNode = $createImageNode({ src: result.url, altText: file.name });
         $getRoot().append(imageNode);
+      });
+    };
+    input.click();
+  }
+
+  function handleVideoInsert() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'video/mp4,video/webm,video/quicktime,video/x-matroska';
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      if (file.size > MAX_VIDEO_SIZE) {
+        window.alert('حجم ویدیو نباید بیشتر از ۱۰۰ مگابایت باشد.');
+        return;
+      }
+      if (file.type && !ALLOWED_VIDEO_TYPES.includes(file.type)) {
+        window.alert('فرمت ویدیو باید MP4، WebM، MOV یا MKV باشد.');
+        return;
+      }
+      const result = await uploadFile(file);
+      if (!result) return;
+      editor.update(() => {
+        const videoNode = $createVideoNode({ src: result.url });
+        $getRoot().append(videoNode);
       });
     };
     input.click();
@@ -91,6 +134,7 @@ function Toolbar() {
       <button className={btn} onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left')} title="LTR / Align left"><AlignLeft size={14} /></button>
       {sep}
       <button className={btn} onClick={handleImageInsert} title="Insert image"><ImageIcon size={14} /></button>
+      <button className={btn} onClick={handleVideoInsert} title="Insert video"><VideoIcon size={14} /></button>
     </div>
   );
 }
@@ -101,7 +145,10 @@ function HtmlSerializer({ onChange }: { onChange: (html: string) => void }) {
   useEffect(
     () =>
       editor.registerUpdateListener(({ editorState }) => {
-        editorState.read(() => onChange($generateHtmlFromNodes(editor)));
+        editorState.read(
+          () => onChange($generateHtmlFromNodes(editor)),
+          { editor }
+        );
       }),
     [editor, onChange]
   );
@@ -118,11 +165,20 @@ export interface RichEditorProps {
 
 export function RichEditor({
   onChange,
+  initialHtml,
   dir = 'rtl',
   placeholder = 'محتوای خود را اینجا بنویسید...',
 }: RichEditorProps) {
   const initialConfig = {
     namespace: 'ArmaanEditor',
+    editorState: initialHtml
+      ? (editor: LexicalEditor) => {
+          const dom = new DOMParser().parseFromString(initialHtml, 'text/html');
+          const nodes = $generateNodesFromDOM(editor, dom);
+          $getRoot().select();
+          $insertNodes(nodes);
+        }
+      : undefined,
     theme: {
       text: {
         bold: 'font-bold',
@@ -154,6 +210,7 @@ export function RichEditor({
       TableNode, TableCellNode, TableRowNode,
       CodeNode, CodeHighlightNode,
       ImageNode,
+      VideoNode,
     ],
     onError: (err: Error) => console.error('[Lexical]', err),
   };

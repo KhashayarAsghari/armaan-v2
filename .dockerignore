@@ -1,0 +1,17 @@
+node_modules
+.next
+.git
+.env
+.env.*
+!.env.example
+npm-debug.log*
+Dockerfile
+.dockerignore
+docker-compose*.yml
+nginx
+docs
+scripts
+*.md
+.vscode
+.DS_Store
+public/uploads

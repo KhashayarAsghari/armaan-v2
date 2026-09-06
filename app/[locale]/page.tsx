@@ -9,6 +9,10 @@ import { Announcements } from '@/components/home/Announcements';
 import { BlogPreview } from '@/components/home/BlogPreview';
 import { WhyChooseUs } from '@/components/home/WhyChooseUs';
 import { TeamSection } from '@/components/home/TeamSection';
+import { getPublishedPosts, type Locale } from '@/lib/posts';
+
+// Revalidate periodically so newly published/edited posts show up without a full rebuild.
+export const revalidate = 300;
 
 export async function generateMetadata({
   params,
@@ -32,6 +36,11 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const [blogPosts, newsPosts] = await Promise.all([
+    getPublishedPosts('blog', locale as Locale, 3),
+    getPublishedPosts('news', locale as Locale, 3),
+  ]);
+
   return (
     <main className="flex flex-col min-h-screen">
       <Navbar />
@@ -45,11 +54,11 @@ export default async function HomePage({
       <div className="py-4">
         <div className="gold-divider" />
       </div>
-      <Announcements />
+      <Announcements posts={newsPosts} />
       <div className="py-4">
         <div className="gold-divider" />
       </div>
-      <BlogPreview />
+      <BlogPreview posts={blogPosts} />
       <WhyChooseUs />
       <TeamSection />
       <Footer />
