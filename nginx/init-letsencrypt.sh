@@ -21,12 +21,20 @@ if [ ! -f .env ]; then
   exit 1
 fi
 
-# shellcheck disable=SC1091
-set -a; source .env; set +a
+# Deliberately NOT `source .env` here: that file has unquoted values with
+# spaces (e.g. NEXT_PUBLIC_COMPANY_ADDRESS), which bash would try to execute
+# as commands. Instead, pull out just the three keys this script needs.
+read_env_var() {
+  grep -E "^$1=" .env | tail -1 | cut -d '=' -f2- | sed -e 's/^"//' -e 's/"$//'
+}
 
-DOMAIN="${DOMAIN:?set DOMAIN in .env, e.g. example.com}"
-EMAIL="${CERTBOT_EMAIL:?set CERTBOT_EMAIL in .env (used for Let's Encrypt expiry notices)}"
-STAGING="${CERTBOT_STAGING:-0}" # set to 1 in .env first to test against LE's staging server (no rate limits)
+DOMAIN="$(read_env_var DOMAIN)"
+EMAIL="$(read_env_var CERTBOT_EMAIL)"
+STAGING="$(read_env_var CERTBOT_STAGING)"
+STAGING="${STAGING:-0}"
+
+: "${DOMAIN:?set DOMAIN in .env, e.g. example.com}"
+: "${EMAIL:?set CERTBOT_EMAIL in .env (used for Let's Encrypt expiry notices)}"
 
 COMPOSE="docker compose"
 CERT_PATH="/etc/letsencrypt/live/$DOMAIN"
