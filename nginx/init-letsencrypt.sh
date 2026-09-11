@@ -24,17 +24,13 @@ fi
 # Deliberately NOT `source .env` here: that file has unquoted values with
 # spaces (e.g. NEXT_PUBLIC_COMPANY_ADDRESS), which bash would try to execute
 # as commands. Instead, pull out just the three keys this script needs.
-read_env_var() {
-  grep -E "^$1=" .env | tail -1 | cut -d '=' -f2- | sed -e 's/^"//' -e 's/"$//'
-}
-
-DOMAIN="$(read_env_var DOMAIN)"
-EMAIL="$(read_env_var CERTBOT_EMAIL)"
-STAGING="$(read_env_var CERTBOT_STAGING)"
+DOMAIN="$(grep -E '^DOMAIN=' .env | tail -1 | cut -d '=' -f2- | sed -e 's/^"//' -e 's/"$//')"
+EMAIL="$(grep -E '^CERTBOT_EMAIL=' .env | tail -1 | cut -d '=' -f2- | sed -e 's/^"//' -e 's/"$//')"
+STAGING="$(grep -E '^CERTBOT_STAGING=' .env | tail -1 | cut -d '=' -f2- | sed -e 's/^"//' -e 's/"$//')"
 STAGING="${STAGING:-0}"
 
 : "${DOMAIN:?set DOMAIN in .env, e.g. example.com}"
-: "${EMAIL:?set CERTBOT_EMAIL in .env (used for Let's Encrypt expiry notices)}"
+: "${EMAIL:?set CERTBOT_EMAIL in .env, used for certificate expiry notices}"
 
 COMPOSE="docker compose"
 CERT_PATH="/etc/letsencrypt/live/$DOMAIN"
@@ -42,18 +38,14 @@ CERT_PATH="/etc/letsencrypt/live/$DOMAIN"
 echo "== Bootstrapping TLS certificate for: $DOMAIN =="
 
 echo "-- Creating dummy self-signed certificate so nginx can start..."
-$COMPOSE run --rm --entrypoint "\
-  sh -c 'mkdir -p $CERT_PATH && \
-  openssl req -x509 -nodes -newkey rsa:2048 -days 1 \
-    -keyout $CERT_PATH/privkey.pem \
-    -out $CERT_PATH/fullchain.pem \
-    -subj \"/CN=$DOMAIN\"'" certbot
+$COMPOSE run --rm --entrypoint sh certbot -c \
+  "mkdir -p '$CERT_PATH' && openssl req -x509 -nodes -newkey rsa:2048 -days 1 -keyout '$CERT_PATH/privkey.pem' -out '$CERT_PATH/fullchain.pem' -subj '/CN=$DOMAIN'"
 
 echo "-- Starting nginx with the dummy certificate..."
 $COMPOSE up -d nginx
 
 echo "-- Deleting dummy certificate..."
-$COMPOSE run --rm --entrypoint "sh -c 'rm -rf $CERT_PATH'" certbot
+$COMPOSE run --rm --entrypoint sh certbot -c "rm -rf '$CERT_PATH'"
 
 echo "-- Requesting real certificate from Let's Encrypt..."
 staging_arg=""
@@ -62,15 +54,16 @@ if [ "$STAGING" != "0" ]; then
   echo "   (using Let's Encrypt STAGING environment — certificate will not be trusted by browsers)"
 fi
 
-$COMPOSE run --rm --entrypoint "\
-  certbot certonly --webroot -w /var/www/certbot \
-    $staging_arg \
-    --email $EMAIL \
-    -d $DOMAIN \
-    --rsa-key-size 2048 \
-    --agree-tos \
-    --no-eff-email \
-    --force-renewal" certbot
+# No --entrypoint/sh -c needed here — the certbot image's default entrypoint
+# already IS the certbot binary, so args are passed straight through.
+$COMPOSE run --rm certbot certonly --webroot -w /var/www/certbot \
+  $staging_arg \
+  --email "$EMAIL" \
+  -d "$DOMAIN" \
+  --rsa-key-size 2048 \
+  --agree-tos \
+  --no-eff-email \
+  --force-renewal
 
 echo "-- Reloading nginx with the real certificate..."
 $COMPOSE exec nginx nginx -s reload
